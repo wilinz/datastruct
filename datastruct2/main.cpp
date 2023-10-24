@@ -1,254 +1,229 @@
-#include<iostream>
-#include<string>
+#include <iostream>
 
-template<typename DataType>
-struct Node {
-    DataType data;
-    Node<DataType> *next;
+// 定义一个模板结构体，表示链表节点
+template<typename T>
+struct ListNode {
+    T val; // 节点值
+    ListNode *next; // 指向下一个节点的指针
+    ListNode(T x) : val(x), next(nullptr) {} // 构造函数，初始化节点值和指针
 };
 
-template<typename DataType>
-class LinkList {
-private:
-    Node<DataType> *first;
+// 定义一个模板类，表示链表
+template<typename T>
+class LinkedList {
 public:
-    LinkList();
+    ListNode<T> *head; // 指向链表头节点的指针
 
-    ~LinkList();
+    // 构造函数，初始化链表
+    LinkedList() : head(nullptr) {}
 
-    void insert(DataType a, bool reverse = false);
+    // 插入节点的函数
+    void insert(T val, bool reverse = false);
 
-    void printList();
+    // 打印链表的函数
+    void print();
 
-    LinkList<DataType> *intersection(LinkList<DataType> &l);
+    // 求两个链表的交集的函数
+    LinkedList<T> intersection(LinkedList<T> &other);
 
-    LinkList<DataType> *unionlist(LinkList<DataType> &l);
+    // 求两个链表的并集的函数
+    LinkedList<T> unionList(LinkedList<T> &other);
 
+    // 判断链表中是否包含某个值的函数
+    bool contains(T val);
+
+    // 反转链表的函数
     void reverse();
 
-    LinkList<DataType> *combine(LinkList<DataType> &l);
+    // 合并两个有序链表的函数
+    LinkedList<T> merge(LinkedList<T> &other);
 
-    LinkList<DataType> *duplicate();
-
-    void removeduplicates();
+    // 复制链表的函数
+    LinkedList<T> duplicate();
 };
 
-template<typename DataType>
-LinkList<DataType>::LinkList() {
-    first = new Node<DataType>;
-    first->next = nullptr;
-}
-
-template<typename DataType>
-LinkList<DataType>::~LinkList() {
-    Node<DataType> *p = first;
-    while (first != nullptr) {
-        first = first->next;
-        delete p;
-        p = first;
+// 复制链表的函数
+template<typename T>
+LinkedList<T> LinkedList<T>::duplicate() {
+    LinkedList<T> result; // 创建一个新的链表对象
+    ListNode<T> *node = head; // 遍历原链表的指针
+    while (node) {
+        result.insert(node->val); // 将原链表节点的值插入到新链表中两次
+        result.insert(node->val);
+        node = node->next; // 移动到下一个节点
     }
+    return result; // 返回复制后的链表
 }
 
-template<typename DataType>
-void LinkList<DataType>::insert(DataType a, bool reverse) {
-    Node<DataType> *newNode = new Node<DataType>;
-    newNode->data = a;
-
-    if (reverse) {
-        Node<DataType> *p = first;
-        while (p->next != nullptr && p->next->data < a) {
-            p = p->next;
-        }
-        newNode->next = p->next;
-        p->next = newNode;
-    } else {
-        newNode->next = first->next;
-        first->next = newNode;
-    }
-}
-
-template<typename DataType>
-void LinkList<DataType>::printList() {
-    Node<DataType> *p = first->next;
-    while (p != nullptr) {
-        std::cout << p->data << " ";
-        p = p->next;
-    }
-    std::cout << std::endl;
-}
-
-template<typename DataType>
-LinkList<DataType> *LinkList<DataType>::intersection(LinkList<DataType> &l) {
-    LinkList<DataType> *result = new LinkList<DataType>;
-
-    Node<DataType> *p1 = first->next;
-    Node<DataType> *p2 = l.first->next;
-
-    while (p1 != nullptr && p2 != nullptr) {
-        if (p1->data == p2->data) {
-            result->insert(p1->data);
-            p1 = p1->next;
-            p2 = p2->next;
-        } else if (p1->data < p2->data) {
-            p1 = p1->next;
+// 合并两个有序链表的函数
+template<typename T>
+LinkedList<T> LinkedList<T>::merge(LinkedList<T> &other) {
+    LinkedList<T> result; // 创建一个新的链表对象
+    ListNode<T> *nodeA = head; // 遍历第一个链表的指针
+    ListNode<T> *nodeB = other.head; // 遍历第二个链表的指针
+    while (nodeA && nodeB) {
+        if (nodeA->val > nodeB->val) { // 如果第一个链表节点的值大于第二个链表节点的值
+            result.insert(nodeA->val); // 将第一个链表节点的值插入到新链表中
+            nodeA = nodeA->next; // 移动到下一个节点
         } else {
-            p2 = p2->next;
+            result.insert(nodeB->val); // 将第二个链表节点的值插入到新链表中
+            nodeB = nodeB->next; // 移动到下一个节点
         }
     }
-
-    return result;
+    while (nodeA) {
+        result.insert(nodeA->val); // 将第一个链表剩余节点的值插入到新链表中
+        nodeA = nodeA->next; // 移动到下一个节点
+    }
+    while (nodeB) {
+        result.insert(nodeB->val); // 将第二个链表剩余节点的值插入到新链表中
+        nodeB = nodeB->next; // 移动到下一个节点
+    }
+    return result; // 返回合并后的链表
 }
 
-template<typename DataType>
-LinkList<DataType> *LinkList<DataType>::unionlist(LinkList<DataType> &l) {
-    LinkList<DataType> *result = new LinkList<DataType>;
-
-    Node<DataType> *p1 = first->next;
-    Node<DataType> *p2 = l.first->next;
-
-    while (p1 != nullptr && p2 != nullptr) {
-        if (p1->data == p2->data) {
-            result->insert(p1->data);
-            p1 = p1->next;
-            p2 = p2->next;
-        } else if (p1->data < p2->data) {
-            result->insert(p1->data);
-            p1 = p1->next;
-        } else {
-            result->insert(p2->data);
-            p2 = p2->next;
-        }
-    }
-
-    while (p1 != nullptr) {
-        result->insert(p1->data);
-        p1 = p1->next;
-    }
-
-    while (p2 != nullptr) {
-        result->insert(p2->data);
-        p2 = p2->next;
-    }
-
-    return result;
-}
-
-template<typename DataType>
-void LinkList<DataType>::reverse() {
-    Node<DataType> *prev = nullptr;
-    Node<DataType> *current = first->next;
-    Node<DataType> *next = nullptr;
-
+// 反转链表的函数
+template<typename T>
+void LinkedList<T>::reverse() {
+    ListNode<T> *prev = nullptr; // 前一个节点的指针
+    ListNode<T> *current = head; // 当前节点的指针
+    ListNode<T> *next = nullptr; // 下一个节点的指针
     while (current != nullptr) {
-        next = current->next;
-        current->next = prev;
-        prev = current;
-        current = next;
+        next = current->next; // 保存下一个节点的指针
+        current->next = prev; // 将当前节点的指针指向前一个节点
+        prev = current; // 更新前一个节点的指针
+        current = next; // 更新当前节点的指针
     }
-
-    first->next = prev;
+    head = prev; // 更新链表头节点的指针
 }
 
-template<typename DataType>
-LinkList<DataType> *LinkList<DataType>::combine(LinkList<DataType> &l) {
-    LinkList<DataType> *result = new LinkList<DataType>;
-
-    Node<DataType> *p1 = first->next;
-    Node<DataType> *p2 = l.first->next;
-
-    while (p1 != nullptr && p2 != nullptr) {
-        if (p1->data >= p2->data) {
-            result->insert(p1->data, true);
-            p1 = p1->next;
-        } else {
-            result->insert(p2->data, true);
-            p2 = p2->next;
+// 判断链表中是否包含某个值的函数
+template<typename T>
+bool LinkedList<T>::contains(T val) {
+    ListNode<T> *node = head; // 遍历链表的指针
+    while (node) {
+        if (node->val == val) { // 如果节点的值等于目标值
+            return true; // 返回true
         }
+        node = node->next; // 移动到下一个节点
     }
-
-    while (p1 != nullptr) {
-        result->insert(p1->data, true);
-        p1 = p1->next;
-    }
-
-    while (p2 != nullptr) {
-        result->insert(p2->data, true);
-        p2 = p2->next;
-    }
-
-    return result;
+    return false; // 链表中不包含目标值，返回false
 }
 
-template<typename DataType>
-LinkList<DataType> *LinkList<DataType>::duplicate() {
-    LinkList<DataType> *result = new LinkList<DataType>;
-
-    Node<DataType> *p = first->next;
-    while (p != nullptr) {
-        result->insert(p->data);
-        result->insert(p->data);
-        p = p->next;
+// 求两个链表的并集的函数
+template<typename T>
+LinkedList<T> LinkedList<T>::unionList(LinkedList<T> &other) {
+    LinkedList<T> result; // 创建一个新的链表对象
+    ListNode<T> *node = head; // 遍历第一个链表的指针
+    while (node) {
+        result.insert(node->val); // 将第一个链表节点的值插入到新链表中
+        node = node->next; // 移动到下一个节点
     }
+    node = other.head; // 遍历第二个链表的指针
+    while (node) {
+        if (!result.contains(node->val)) { // 如果新链表中不包含第二个链表节点的值
+            result.insert(node->val); // 将第二个链表节点的值插入到新链表中
+        }
+        node = node->next; // 移动到下一个节点
+    }
+    return result; // 返回并集链表
+}
 
-    return result;
+// 求两个链表的交集的函数
+template<typename T>
+LinkedList<T> LinkedList<T>::intersection(LinkedList<T> &other) {
+    LinkedList<T> result; // 创建一个新的链表对象
+    ListNode<T> *nodeA = head; // 遍历第一个链表的指针
+    while (nodeA) {
+        ListNode<T> *nodeB = other.head; // 遍历第二个链表的指针
+        bool found = false; // 是否找到交集节点的标志
+        while (nodeB) {
+            if (nodeA->val == nodeB->val) { // 如果第一个链表节点的值等于第二个链表节点的值
+                found = true; // 设置找到交集节点的标志为true
+                break; // 跳出内层循环
+            }
+            nodeB = nodeB->next; // 移动到第二个链表的下一个节点
+        }
+        if (found) {
+            result.insert(nodeA->val); // 将交集节点的值插入到新链表中
+        }
+        nodeA = nodeA->next; // 移动到第一个链表的下一个节点
+    }
+    return result; // 返回交集链表
+}
+
+// 打印链表的函数
+template<typename T>
+void LinkedList<T>::print() {
+    ListNode<T> *node = head; // 遍历链表的指针
+    while (node) {
+        std::cout << node->val << " "; // 输出节点的值
+        node = node->next; // 移动到下一个节点
+    }
+    std::cout << std::endl; // 输出换行符
+}
+
+// 插入节点的函数
+template<typename T>
+void LinkedList<T>::insert(T val, bool reverse) {
+    ListNode<T> *node = new ListNode<T>(val); // 创建一个新的节点
+    if (!head || (reverse ? head->val >= node->val : head->val <= node->val)) {
+        // 如果链表为空或插入的节点值小于等于链表头节点的值（如果reverse为true则判断大于等于）
+        node->next = head; // 将新节点的指针指向链表头节点
+        head = node; // 更新链表头节点的指针为新节点
+    } else {
+        ListNode<T> *cur = head; // 遍历链表的指针
+        while (cur->next && (reverse ? cur->next->val < node->val : cur->next->val > node->val)) {
+            // 遍历链表直到找到插入位置（如果reverse为true则判断大于）
+            cur = cur->next; // 移动到下一个节点
+        }
+        node->next = cur->next; // 将新节点的指针指向当前节点的下一个节点
+        cur->next = node; // 将当前节点的指针指向新节点
+    }
 }
 
 int main() {
-    LinkList<int> a;
-    LinkList<int> b;
+    LinkedList<int> listA; // 创建一个整型链表对象listA
+    LinkedList<int> listB; // 创建一个整型链表对象listB
 
-    // Insert 5 unordered integers into list a and sort in descending order
-    std::cout << "Enter 5 integers for list a: ";
-    for (int i = 0; i < 5; i++) {
+    std::cout << "Enter 5 unordered integers for list A: ";
+    for (int i = 0; i < 5; ++i) {
         int num;
         std::cin >> num;
-        a.insert(num, true);
+        listA.insert(num, true); // 将输入的整数插入到listA中，按递减顺序插入
     }
 
-    // Insert 5 unordered integers into list b and sort in descending order
-    std::cout << "Enter 5 integers for list b: ";
-    for (int i = 0; i < 5; i++) {
+    std::cout << "Enter 5 unordered integers for list B: ";
+    for (int i = 0; i < 5; ++i) {
         int num;
         std::cin >> num;
-        b.insert(num);
+        listB.insert(num); // 将输入的整数插入到listB中，按递增顺序插入
     }
 
-    // Print lists a and b
-    std::cout << "List a: ";
-    a.printList();
-    std::cout << "List b: ";
-    b.printList();
+    std::cout << "List A: ";
+    listA.print(); // 打印listA
 
-    // Find intersection of lists a and b
-    LinkList<int> *intersectionList = a.intersection(b);
+    std::cout << "List B: ";
+    listB.print(); // 打印listB
+
+    LinkedList<int> intersection = listA.intersection(listB); // 求listA和listB的交集
     std::cout << "Intersection: ";
-    intersectionList->printList();
+    intersection.print(); // 打印交集
 
-    // Find union of lists a and b
-    LinkList<int> *unionList = a.unionlist(b);
+    LinkedList<int> unionList = listA.unionList(listB); // 求listA和listB的并集
     std::cout << "Union: ";
-    unionList->printList();
+    unionList.print(); // 打印并集
 
-    // Reverse list b
-    b.reverse();
-    std::cout << "Reversed list b: ";
-    b.printList();
+    listB.reverse(); // 反转listB
+    std::cout << "Reversed list B: ";
+    listB.print(); // 打印反转后的listB
 
-    // Combine lists a and b in descending order
-    LinkList<int> *combinedList = a.combine(b);
-    std::cout << "Combined list (descending order): ";
-    combinedList->printList();
+    LinkedList<int> merged = listA.merge(listB); // 合并listA和listB
+    std::cout << "Merged list: ";
+    merged.print(); // 打印合并后的链表
 
-    // Duplicate combined list
-    LinkList<int> *duplicatedList = combinedList->duplicate();
-    std::cout << "Duplicated combined list: ";
-    duplicatedList->printList();
-
-    // Clean up memory
-    delete intersectionList;
-    delete unionList;
-    delete combinedList;
-    delete duplicatedList;
+    LinkedList<int> duplicated = merged.duplicate(); // 复制合并后的链表
+    std::cout << "Duplicated list: ";
+    duplicated.print(); // 打印复制后的链表
 
     return 0;
 }
