@@ -1,3 +1,0 @@
-/mnt/c/Users/wilinz/CLionProjects/datastruct/datastruct5/cmake-build-debug/CMakeFiles/datastruct5.dir
-/mnt/c/Users/wilinz/CLionProjects/datastruct/datastruct5/cmake-build-debug/CMakeFiles/edit_cache.dir
-/mnt/c/Users/wilinz/CLionProjects/datastruct/datastruct5/cmake-build-debug/CMakeFiles/rebuild_cache.dir
